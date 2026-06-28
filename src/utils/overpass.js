@@ -29,7 +29,10 @@ export async function fetchBuildings(category, lat, lon) {
 
   const response = await fetch(OVERPASS_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    },
     body: `data=${encodeURIComponent(query)}`,
   });
 
