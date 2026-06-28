@@ -1,16 +1,138 @@
-# React + Vite
+# 🇮🇳 GovLocator India
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive map to find government offices and public facilities across Indian cities — built with React, Leaflet, and OpenStreetMap.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What It Does
 
-## React Compiler
+GovLocator India helps citizens quickly locate government buildings in their city. Select a state, pick a city, choose the type of facility you're looking for, and the app pins all matching locations on a zoomable, interactive map. Click any pin to see the name, address, phone number, and a direct link to get directions via Google Maps.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **10 facility categories** covering the most commonly needed government offices
+- **Interactive map** powered by Leaflet and OpenStreetMap — fully zoomable and pannable
+- **Live data** fetched from OpenStreetMap's Overpass API — no API key required
+- **Client-side government filtering** — results are filtered by name keywords and `operator:type` tags to surface only public/government facilities
+- **Static curated data** for offices with thin OSM coverage (e.g. EPFO sub-regional offices)
+- **Your location** — click "Use My Location" to drop a pulsing blue dot on the map
+- **Distance display** — every pin popup shows how far it is from your current location
+- **Results list panel** — all results listed alongside the map, sorted nearest-first when your location is shared
+- **Click to zoom** — clicking any item in the results list flies the map to that pin and opens its popup
+- **Auto fit-bounds** — when your location is known, after a search the map automatically zooms to frame your location and the 10 nearest results
+- **10 states, 50 cities** pre-configured with coordinates
+
+---
+
+## Facility Categories
+
+| Icon | Category | Data Source |
+|------|----------|-------------|
+| 🏥 | Government Hospitals | OpenStreetMap (`amenity=hospital`) |
+| 🩺 | UPHC / Primary Health Centres | OpenStreetMap (`healthcare=centre`) |
+| 🏛️ | PF / EPFO Offices | OpenStreetMap + static curated data |
+| 📋 | Revenue Department / Tahsildar | OpenStreetMap (`office=government`) |
+| 📝 | Registration Department | OpenStreetMap (`office=government`) |
+| 🏪 | Ration Shops / PDS Offices | OpenStreetMap (`office=government`, TNPDS) |
+| 👮 | Police Stations | OpenStreetMap (`amenity=police`) |
+| 📮 | Post Offices | OpenStreetMap (`amenity=post_office`) |
+| ⚖️ | Courts | OpenStreetMap (`amenity=courthouse`) |
+| 🏦 | Government Banks | OpenStreetMap (`amenity=bank`) |
+| 🏫 | Government Schools | OpenStreetMap (`amenity=school`) |
+
+---
+
+## States & Cities Covered
+
+| State | Cities |
+|-------|--------|
+| Tamil Nadu | Chennai, Coimbatore, Madurai, Tiruchirappalli, Salem |
+| Karnataka | Bengaluru, Mysuru, Mangaluru, Hubballi, Belagavi |
+| Maharashtra | Mumbai, Pune, Nagpur, Nashik, Aurangabad |
+| Telangana | Hyderabad, Warangal, Nizamabad, Karimnagar, Khammam |
+| Delhi | New Delhi, Dwarka, Rohini, Noida, Gurugram |
+| West Bengal | Kolkata, Howrah, Durgapur, Asansol, Siliguri |
+| Gujarat | Ahmedabad, Surat, Vadodara, Rajkot, Bhavnagar |
+| Rajasthan | Jaipur, Jodhpur, Udaipur, Kota, Ajmer |
+| Uttar Pradesh | Lucknow, Kanpur, Agra, Varanasi, Allahabad |
+| Kerala | Thiruvananthapuram, Kochi, Kozhikode, Thrissur, Kollam |
+
+---
+
+## Tech Stack
+
+- **React 18** + **Vite** — frontend framework and build tool
+- **Leaflet** + **react-leaflet** — interactive map rendering
+- **OpenStreetMap** — map tiles (free, no API key)
+- **Overpass API** — querying OSM data by location and tag
+- **Browser Geolocation API** — user's current position
+- **Haversine formula** — straight-line distance calculation
+
+---
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+The app runs at `http://localhost:5173` by default.
+
+---
+
+## How Data Works
+
+Results come from two sources that are merged together:
+
+1. **OpenStreetMap via Overpass API** — a live query is made for each search within a 15 km radius of the city centre. Results are filtered client-side using name keywords (e.g. `"govt"`, `"corporation"`, `"uphc"`, `"sbi"`) and `operator:type` tags to keep only government/public facilities.
+
+2. **Static curated data** (`src/data/staticData.js`) — for offices that are known to exist but aren't mapped in OSM yet (primarily EPFO sub-regional offices). These are merged with OSM results and duplicates within 200 m are automatically skipped.
+
+### Known Limitations
+
+- OSM coverage varies by city. Major cities have good data for hospitals, police stations, post offices, and schools. Smaller offices (registration, revenue) may have gaps.
+- Ration shops (PDS) are sparsely mapped in OSM — only TNPDS service offices and similar district-level offices appear, not individual fair price shops.
+- Distances shown are straight-line (as the crow flies), not road distances.
+
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── MapView.jsx       # Leaflet map, markers, popups
+│   ├── Sidebar.jsx       # State/city/category selectors
+│   └── ResultsList.jsx   # Scrollable results panel
+├── data/
+│   ├── locations.js      # States, cities, coordinates, category definitions
+│   └── staticData.js     # Curated static office data (EPFO etc.)
+├── utils/
+│   ├── overpass.js       # Overpass API query builder and fetcher
+│   └── distance.js       # Haversine distance, geolocation helper
+├── App.jsx               # Main app state and layout
+└── App.css               # All styles
+```
+
+---
+
+## Contributing
+
+Adding a new city is as simple as adding an entry to `cityCenters` and `statesAndCities` in `src/data/locations.js`. Adding a new facility category requires a new entry in `buildingCategories` with the appropriate OSM tags and name keywords.
+
+For offices missing from OSM, add them to `src/data/staticData.js` under the relevant category ID.
+
+---
+
+## License
+
+MIT
