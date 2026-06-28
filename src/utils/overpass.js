@@ -3,6 +3,10 @@ import { getStaticOfficesNearby, mergeWithStatic } from "../data/staticData";
 const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
 const SEARCH_RADIUS = 15000; // 15 km
 
+// Use our proxy in production (Vercel), hit Overpass directly in dev
+const IS_DEV = import.meta.env.DEV;
+const API_ENDPOINT = IS_DEV ? OVERPASS_URL : "/api/overpass";
+
 /**
  * Build an Overpass QL query from a category's tag list
  */
@@ -27,17 +31,29 @@ function buildQuery(category, lat, lon) {
 export async function fetchBuildings(category, lat, lon) {
   const query = buildQuery(category, lat, lon);
 
-  const response = await fetch(OVERPASS_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    },
-    body: `data=${encodeURIComponent(query)}`,
-  });
+  let response;
+
+  if (IS_DEV) {
+    // In dev: POST query string directly to Overpass
+    response = await fetch(OVERPASS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "*/*",
+      },
+      body: `data=${encodeURIComponent(query)}`,
+    });
+  } else {
+    // In production: send through our Vercel proxy
+    response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    });
+  }
 
   if (!response.ok) {
-    throw new Error(`Overpass API returned ${response.status}`);
+    throw new Error(`Request failed with status ${response.status}`);
   }
 
   const data = await response.json();
