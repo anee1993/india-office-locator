@@ -6,7 +6,7 @@ An interactive map to find government offices and public facilities across India
 
 ## What It Does
 
-GovLocator India helps citizens quickly locate government buildings in their city. Select a state, pick a city, choose the type of facility you're looking for, and the app pins all matching locations on a zoomable, interactive map. Click any pin to see the name, address, phone number, and a direct link to get directions via Google Maps.
+GovLocator India helps citizens quickly locate government buildings in their city. Select a state, pick a city, choose the type of facility you're looking for, and the app pins all matching locations on a zoomable, interactive map. Click any pin to see the facility name and a direct link to get directions via Google Maps. Address and phone details are shown where available in OpenStreetMap — static curated entries (like EPFO offices) always include full details.
 
 ---
 
@@ -16,9 +16,10 @@ GovLocator India helps citizens quickly locate government buildings in their cit
 - **Interactive map** powered by Leaflet and OpenStreetMap — fully zoomable and pannable
 - **Live data** fetched from OpenStreetMap's Overpass API — no API key required
 - **Client-side government filtering** — results are filtered by name keywords and `operator:type` tags to surface only public/government facilities
-- **Static curated data** for offices with thin OSM coverage (e.g. EPFO sub-regional offices)
+- **Static curated data** for offices with thin OSM coverage (e.g. EPFO sub-regional offices), including full address and phone details
+- **Pin popups** — click any marker to see the facility name, address and phone where available, distance from your location, and a Get Directions link to Google Maps
 - **Your location** — click "Use My Location" to drop a pulsing blue dot on the map
-- **Distance display** — every pin popup shows how far it is from your current location
+- **Distance display** — every pin popup shows straight-line distance from your current location
 - **Results list panel** — all results listed alongside the map, sorted nearest-first when your location is shared
 - **Click to zoom** — clicking any item in the results list flies the map to that pin and opens its popup
 - **Auto fit-bounds** — when your location is known, after a search the map automatically zooms to frame your location and the 10 nearest results
